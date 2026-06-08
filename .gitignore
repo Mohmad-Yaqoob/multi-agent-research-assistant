@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+memory.db
+venv/
+.DS_Store
+faiss_stores/

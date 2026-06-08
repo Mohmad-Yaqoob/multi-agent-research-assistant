@@ -1,0 +1,17 @@
+# Pinned versions come from your tested local env: run `pip freeze` there and
+# paste the exact versions before submitting, so the build is reproducible.
+streamlit
+langchain
+langchain-core
+langchain-groq
+langchain-community
+langchain-huggingface
+langchain-text-splitters
+langgraph
+langgraph-checkpoint-sqlite
+faiss-cpu
+sentence-transformers
+pypdf
+ddgs
+python-dotenv
+requests

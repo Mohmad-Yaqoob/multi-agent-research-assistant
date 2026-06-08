@@ -1,0 +1,20 @@
+{
+  "num_questions": 10,
+  "num_scored": 10,
+  "metrics": {
+    "faithfulness": 0.91,
+    "answer_relevancy": 0.56,
+    "answer_correctness": 0.28
+  },
+  "faithfulness_coverage": "10/10 had retrieved context",
+  "latency_ms": {
+    "p50": 336.5,
+    "p90": 569.4
+  },
+  "targets_met": {
+    "faithfulness_gt_085": true,
+    "answer_relevancy_gt_080": false,
+    "p90_lt_2000ms": true
+  },
+  "judge_model": "llama-3.3-70b-versatile"
+}

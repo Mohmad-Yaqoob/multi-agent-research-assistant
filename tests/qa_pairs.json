@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What is ReAct and what does it combine?",
+    "ground_truth": "ReAct is a prompting approach that interleaves reasoning traces (chain-of-thought style verbal reasoning) with task-specific actions, letting a language model reason about what to do and then act, using the results of actions to inform further reasoning."
+  },
+  {
+    "question": "What problem does ReAct address that plain chain-of-thought reasoning has?",
+    "ground_truth": "Chain-of-thought reasoning alone is prone to hallucination and error propagation because it has no way to interact with or verify against an external environment. ReAct grounds reasoning in real actions and observations to reduce this."
+  },
+  {
+    "question": "How does ReAct perform compared to CoT on the Fever fact verification dataset?",
+    "ground_truth": "ReAct outperforms CoT on Fever, achieving around 60.9% accuracy compared to CoT's 56.3%."
+  },
+  {
+    "question": "How does ReAct compare to CoT on HotpotQA?",
+    "ground_truth": "ReAct slightly underperforms CoT on HotpotQA, scoring around 27.4 EM compared to CoT's 29.4 EM."
+  },
+  {
+    "question": "What is a major failure mode of CoT that ReAct helps reduce?",
+    "ground_truth": "Hallucination is a major failure mode of CoT, accounting for a large share of its errors; ReAct's access to external information via actions produces more grounded, fact-driven reasoning traces."
+  },
+  {
+    "question": "What environments or benchmarks was ReAct evaluated on?",
+    "ground_truth": "ReAct was evaluated on question answering (HotpotQA), fact verification (Fever), and interactive decision-making tasks such as ALFWorld and WebShop."
+  },
+  {
+    "question": "What is the capital of France?",
+    "ground_truth": "Paris"
+  },
+  {
+    "question": "Who won the 2024 Cricket World Cup?",
+    "ground_truth": "India won the 2024 T20 Cricket World Cup."
+  },
+  {
+    "question": "What is the current weather-appropriate clothing for a rainy day?",
+    "ground_truth": "A raincoat, waterproof shoes, and an umbrella are typically recommended for rainy weather."
+  },
+  {
+    "question": "What is the boiling point of water at sea level in Celsius?",
+    "ground_truth": "100 degrees Celsius"
+  }
+]
