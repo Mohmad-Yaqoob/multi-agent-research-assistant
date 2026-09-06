@@ -50,18 +50,11 @@ def _judge(llm, system: str, user: str) -> float:
     from langchain_core.messages import SystemMessage, HumanMessage
     try:
         resp = llm.invoke([SystemMessage(content=system), HumanMessage(content=user)])
+        print(f"      [judge raw] {resp.content[:120]!r}")
         return parse_score(resp.content)
-    except Exception:
+    except Exception as e:
+        print(f"      [judge ERROR] {e}")
         return 0.0
-
-
-_FAITHFULNESS_SYS = (
-    "You are a strict evaluator. Given CONTEXT and an ANSWER, judge how well every "
-    "factual claim in the ANSWER is supported by the CONTEXT. "
-    "1.0 = every claim is grounded in the context; 0.0 = the answer contradicts or "
-    "invents facts not in the context. "
-    'Reply ONLY with JSON: {"score": <0-1 float>, "reason": "<one sentence>"}.'
-)
 
 _RELEVANCY_SYS = (
     "You are a strict evaluator. Given a QUESTION and an ANSWER, judge how directly "
@@ -79,15 +72,28 @@ _CORRECTNESS_SYS = (
 )
 
 
-def faithfulness(llm, context: str, answer: str) -> float:
-    if not context or not context.strip():
-        return None  # no retrieved context -> metric undefined for this item
-    return _judge(llm, _FAITHFULNESS_SYS, f"CONTEXT:\n{context}\n\nANSWER:\n{answer}")
-
-
 def answer_relevancy(llm, question: str, answer: str) -> float:
     return _judge(llm, _RELEVANCY_SYS, f"QUESTION:\n{question}\n\nANSWER:\n{answer}")
 
 
 def answer_correctness(llm, ground_truth: str, answer: str) -> float:
     return _judge(llm, _CORRECTNESS_SYS, f"REFERENCE:\n{ground_truth}\n\nCANDIDATE:\n{answer}")
+
+
+
+
+_FAITHFULNESS_SYS = (
+    "You are a strict evaluator. Given CONTEXT and an ANSWER, judge how well every "
+    "factual claim in the ANSWER is supported by the CONTEXT. "
+    "1.0 = every claim is grounded in the context; 0.0 = the answer contradicts or "
+    "invents facts not in the context. Use the full 0-1 range for partial grounding. "
+    'Reply ONLY with JSON: {"score": <0-1 float>, "reason": "<one sentence>"}.'
+)
+
+
+def faithfulness(llm, context: str, answer: str):
+    if not context or not context.strip():
+        return None
+    if "does not contain this information" in answer.lower():
+        return None  # honest refusal — don't penalize
+    return _judge(llm, _FAITHFULNESS_SYS, f"CONTEXT:\n{context}\n\nANSWER:\n{answer}")

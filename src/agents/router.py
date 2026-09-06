@@ -7,7 +7,7 @@ load_dotenv()
 
 
 llm = ChatGroq(
-    model="llama-3.1-8b-instant",
+    model="openai/gpt-oss-20b",
     api_key=os.getenv("GROQ_API_KEY"),
     temperature=0,
     max_tokens=10,
@@ -39,7 +39,10 @@ def classify(query: str) -> str:
         return "complex"
 
 
+# def get_model(query: str) -> tuple:
+#     qtype = classify(query)
+#     8B stays the workhorse for latency; qtype still drives the calc/tool path.
+#     return "llama-3.1-8b-instant", qtype
 def get_model(query: str) -> tuple:
     qtype = classify(query)
-    # 8B stays the workhorse for latency; qtype still drives the calc/tool path.
-    return "llama-3.1-8b-instant", qtype
+    return "openai/gpt-oss-20b", qtype

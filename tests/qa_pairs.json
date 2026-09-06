@@ -1,42 +1,16 @@
 [
-  {
-    "question": "What is ReAct and what does it combine?",
-    "ground_truth": "ReAct is a prompting approach that interleaves reasoning traces (chain-of-thought style verbal reasoning) with task-specific actions, letting a language model reason about what to do and then act, using the results of actions to inform further reasoning."
-  },
-  {
-    "question": "What problem does ReAct address that plain chain-of-thought reasoning has?",
-    "ground_truth": "Chain-of-thought reasoning alone is prone to hallucination and error propagation because it has no way to interact with or verify against an external environment. ReAct grounds reasoning in real actions and observations to reduce this."
-  },
-  {
-    "question": "How does ReAct perform compared to CoT on the Fever fact verification dataset?",
-    "ground_truth": "ReAct outperforms CoT on Fever, achieving around 60.9% accuracy compared to CoT's 56.3%."
-  },
-  {
-    "question": "How does ReAct compare to CoT on HotpotQA?",
-    "ground_truth": "ReAct slightly underperforms CoT on HotpotQA, scoring around 27.4 EM compared to CoT's 29.4 EM."
-  },
-  {
-    "question": "What is a major failure mode of CoT that ReAct helps reduce?",
-    "ground_truth": "Hallucination is a major failure mode of CoT, accounting for a large share of its errors; ReAct's access to external information via actions produces more grounded, fact-driven reasoning traces."
-  },
-  {
-    "question": "What environments or benchmarks was ReAct evaluated on?",
-    "ground_truth": "ReAct was evaluated on question answering (HotpotQA), fact verification (Fever), and interactive decision-making tasks such as ALFWorld and WebShop."
-  },
-  {
-    "question": "What is the capital of France?",
-    "ground_truth": "Paris"
-  },
-  {
-    "question": "Who won the 2024 Cricket World Cup?",
-    "ground_truth": "India won the 2024 T20 Cricket World Cup."
-  },
-  {
-    "question": "What is the current weather-appropriate clothing for a rainy day?",
-    "ground_truth": "A raincoat, waterproof shoes, and an umbrella are typically recommended for rainy weather."
-  },
-  {
-    "question": "What is the boiling point of water at sea level in Celsius?",
-    "ground_truth": "100 degrees Celsius"
-  }
+  {"question": "What is ReAct and what does it combine?", "ground_truth": "ReAct interleaves reasoning traces with task-specific actions, letting the model reason and act using observations from the environment."},
+  {"question": "What problem does ReAct address that plain chain-of-thought reasoning has?", "ground_truth": "CoT reasoning is not grounded in an external environment and is prone to hallucination and error propagation; ReAct grounds reasoning in actions and observations."},
+  {"question": "How does ReAct perform compared to CoT on the Fever fact verification dataset?", "ground_truth": "ReAct outperforms CoT on Fever."},
+  {"question": "How does ReAct compare to CoT on HotpotQA?", "ground_truth": "ReAct slightly lags behind CoT on HotpotQA (27.4 vs 29.4 EM)."},
+  {"question": "What is a major failure mode of CoT that ReAct helps reduce?", "ground_truth": "Hallucination is a major failure mode of CoT; ReAct reduces it by grounding reasoning in retrieved information."},
+  {"question": "What interactive decision-making environments was ReAct evaluated on?", "ground_truth": "ALFWorld and WebShop."},
+  {"question": "What external tool does ReAct use for the knowledge-intensive tasks?", "ground_truth": "A Wikipedia API allowing search and lookup actions."},
+  {"question": "What are the action types ReAct uses in the Wikipedia environment?", "ground_truth": "search, lookup, and finish."},
+  {"question": "Does combining ReAct with CoT self-consistency help?", "ground_truth": "Yes, combining ReAct with CoT self-consistency performs best among the prompting methods."},
+  {"question": "What large language model is primarily used in the ReAct experiments?", "ground_truth": "PaLM-540B."},
+  {"question": "Why does ReAct's performance drop when it cannot retrieve informative knowledge, and how does this compare to CoT's failure mode?", "ground_truth": "ReAct can fail when retrieval returns unhelpful or non-informative results, derailing reasoning and causing it to get stuck in repetitive loops; this is a different failure mode from CoT, whose main failure is hallucination. ReAct's errors are more often reasoning/search-guided, while CoT fabricates facts."},
+  {"question": "How does combining ReAct with CoT self-consistency compare to using either method alone?", "ground_truth": "Combining ReAct with CoT self-consistency (ReAct + CoT-SC) performs best, outperforming both ReAct alone and CoT-SC alone, by using internal knowledge and external retrieved information complementarily."},
+  {"question": "What does the ablation or analysis suggest about the importance of interleaving reasoning with acting, versus acting alone?", "ground_truth": "Interleaving reasoning with acting is important: acting alone (without reasoning traces) performs worse, and sparse reasoning added to actions significantly improves performance, showing reasoning guides the actions."},
+  {"question": "What is the training accuracy of the ReAct model on ImageNet?", "ground_truth": "The paper does not contain this information; ReAct is not evaluated on ImageNet."}
 ]

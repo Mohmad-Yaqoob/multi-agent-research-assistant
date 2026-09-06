@@ -163,13 +163,16 @@ class State(TypedDict):
     latency_ms: float
     context: str
 
-SYSTEM_PROMPT = """You are a helpful research assistant.
-When context is provided below, use it directly to answer the question.
-Do not say "there is no document" if context is provided — just use it.
-If no context is provided, answer from your own knowledge.
-Never fabricate document sources.
-Cite the source filename when answering from documents.
-Be concise and accurate."""
+SYSTEM_PROMPT = "You are a helpful research assistant. Be concise and accurate."
+
+# When document/web context is available, force STRICTLY grounded answers so the
+# model reports what the source says instead of leaning on its own prior knowledge.
+GROUNDED_INSTRUCTION = """Answer using ONLY the information in the Context below.
+Do not use outside or prior knowledge. Do not add facts, numbers, names, or claims
+that are not explicitly stated in the Context.
+If the Context does not contain the answer, reply exactly:
+"The provided document does not contain this information."
+Cite the source when you use it."""
 
 # Agent node
 def agent_node(state: State, config=None) -> dict:
@@ -194,7 +197,7 @@ def agent_node(state: State, config=None) -> dict:
     store = _get_store(thread_id)
     if store:
         try:
-            docs = store.similarity_search(query, k=4)
+            docs = store.similarity_search(query, k=6)
             if docs:
                 context_block = "\n\n".join(d.page_content for d in docs)
                 sources = sorted({d.metadata.get("source_file", "document") for d in docs})
@@ -223,14 +226,19 @@ def agent_node(state: State, config=None) -> dict:
         except Exception:
             pass
 
-    # Build final prompt
-    context_section = ""
+    # Build final prompt — strict grounding when context is present
     if context_block:
-        context_section = f"\nSource: {source}\nContext:\n{context_block}\n"
+        system_text = (
+            SYSTEM_PROMPT
+            + "\n\n" + GROUNDED_INSTRUCTION
+            + f"\n\nSource: {source}\nContext:\n{context_block}\n"
+        )
+    else:
+        system_text = SYSTEM_PROMPT + "\nNo document context is available; answer from your own general knowledge."
     if calc_result:
-        context_section += calc_result
+        system_text += calc_result
 
-    system = SystemMessage(content=SYSTEM_PROMPT + context_section)
+    system = SystemMessage(content=system_text)
 
     history = build_messages(messages[:-1], "")
     history = [m for m in history if not isinstance(m, SystemMessage)]

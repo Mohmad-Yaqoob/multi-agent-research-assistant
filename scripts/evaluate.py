@@ -71,7 +71,7 @@ def main():
     ap.add_argument("--out", default="evaluation_report.json")
     ap.add_argument("--sample", type=int, default=None,
                     help="evaluate only the first N questions")
-    ap.add_argument("--judge-model", default="llama-3.3-70b-versatile")
+    ap.add_argument("--judge-model", default="gemini-3.5-flash-lite")
     ap.add_argument("--delay", type=float, default=1.0,
                     help="seconds between questions (avoids rate limits)")
     ap.add_argument("--doc", default=None,
@@ -97,8 +97,15 @@ def main():
         with open(args.doc, "rb") as f:
             meta = ingest_pdf(f.read(), thread_id=eval_thread_id, filename=os.path.basename(args.doc))
         print(f"Indexed {meta['filename']} ({meta['pages']} pages, {meta['chunks']} chunks) into eval thread\n")
-    judge = ChatGroq(model=args.judge_model, api_key=os.getenv("GROQ_API_KEY"),
-                     temperature=0, max_tokens=200)
+    
+    from langchain_google_genai import ChatGoogleGenerativeAI
+    judge = ChatGoogleGenerativeAI(
+        model=args.judge_model,
+        google_api_key=os.getenv("GEMINI_API_KEY"),
+        temperature=0,
+    )
+    # judge = ChatGroq(model=args.judge_model, api_key=os.getenv("GROQ_API_KEY"),
+    #                  temperature=0, max_tokens=200)
 
     faith, relev, correct, latencies = [], [], [], []
 
@@ -109,6 +116,7 @@ def main():
 
         try:
             answer, context, latency = run_agent(graph, q, eval_thread_id)
+            print(f"    context[:150]: {context[:150]!r}")
         except Exception as e:
             print(f"    agent error: {e}")
             continue

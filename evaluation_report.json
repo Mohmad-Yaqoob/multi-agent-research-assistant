@@ -1,20 +1,20 @@
 {
-  "num_questions": 10,
-  "num_scored": 10,
+  "num_questions": 14,
+  "num_scored": 14,
   "metrics": {
-    "faithfulness": 0.91,
-    "answer_relevancy": 0.56,
-    "answer_correctness": 0.28
+    "faithfulness": 0.9667,
+    "answer_relevancy": 0.9286,
+    "answer_correctness": 0.9286
   },
-  "faithfulness_coverage": "10/10 had retrieved context",
+  "faithfulness_coverage": "12/14 had retrieved context",
   "latency_ms": {
-    "p50": 336.5,
-    "p90": 569.4
+    "p50": 1851.5,
+    "p90": 15186.4
   },
   "targets_met": {
     "faithfulness_gt_085": true,
-    "answer_relevancy_gt_080": false,
-    "p90_lt_2000ms": true
+    "answer_relevancy_gt_080": true,
+    "p90_lt_2000ms": false
   },
-  "judge_model": "llama-3.3-70b-versatile"
+  "judge_model": "gemini-3.5-flash-lite"
 }

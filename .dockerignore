@@ -1,0 +1,11 @@
+venv/
+faiss_stores/
+memory.db
+__pycache__/
+*.pyc
+.git/
+.gitignore
+.env
+tests/sample_pdfs/
+*.md
+.dockerignore

@@ -124,7 +124,7 @@ with st.expander(label, expanded=not current_docs):
 if st.session_state.last_meta:
     m = st.session_state.last_meta
     model = m.get("model_used", "")
-    label = "⚡ Fast (8B)" if "8b" in model else "🧠 Smart (70B)"
+    label = "⚡ Fast (20B)" if "20b" in model else "🧠 Smart (120B)"
     qtype = m.get("query_type", "?")
     st.caption(f"{label} · {qtype} · {m.get('latency_ms', 0):.0f}ms")
 
