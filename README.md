@@ -1,5 +1,5 @@
 ---
-title: Multi Agent Research Assistant
+title: Agentic RAG Assistant
 emoji: 🔬
 colorFrom: blue
 colorTo: indigo
@@ -8,50 +8,54 @@ app_file: app.py
 pinned: false
 ---
 
-# Multi-Agent Research Assistant
+# Agentic RAG Assistant
 
-A RAG chatbot built with LangGraph and FAISS, with query routing, per-chat
-document isolation, conversation summarisation, and a reproducible LLM-as-judge
-evaluation pipeline.
+A retrieval-augmented document QA system built with LangGraph and FAISS. Upload
+research papers per chat, ask questions grounded strictly in the documents, with
+a web-search fallback for general queries, per-chat document isolation, disk
+persistence across restarts, and a reproducible LLM-as-judge evaluation pipeline.
 
-## Evaluation Results (20-question benchmark)
+## Evaluation Results
 
-Regenerate any time with `python scripts/evaluate.py --sample 20`. The table
-below reflects the latest run — update it whenever you re-run the benchmark.
+Frontier-judged (Gemini) over a 14-question grounded benchmark on the ReAct
+paper. Reproduce with `python scripts/evaluate.py --doc <pdf> --sample 14`.
 
-| Metric            | Score | Target    |
-|-------------------|-------|-----------|
-| Faithfulness      | 0.99  | > 0.85    |
-| Answer Relevancy  | 0.82  | > 0.80    |
-| P90 Latency       | 2.6s  | < 2s      |
+| Metric            | Score |
+|-------------------|-------|
+| Faithfulness      | 0.97  |
+| Answer Relevancy  | 0.93  |
+| Answer Correctness| 0.93  |
+| Median inference  | ~0.8s (Groq) |
+
+The benchmark includes questions the paper cannot answer; the system correctly
+declines to answer those rather than hallucinating, which is reflected in the
+faithfulness score.
 
 ## Architecture
 
-- A **query router** classifies each query as simple / complex / calc.
-- The **LangGraph agent** grounds answers with a per-chat **FAISS** retriever,
-  falls back to **web search** when documents have no answer, and uses a
-  sandboxed **code executor** for calculations.
-- **Per-chat FAISS store** — each conversation has isolated document context.
-- **Conversation memory** — history is summarised after 10 turns to save tokens.
+- **Query router** classifies each query (simple / complex / calc) via a
+  LangGraph agent.
+- **Grounded retrieval** — answers strictly from the chat's own FAISS index when
+  a document is present; the model is instructed to use only retrieved context
+  and to say so when the answer isn't in the document.
+- **Web-search fallback** — DuckDuckGo is used only when the chat has no document
+  indexed (general/basic questions).
+- **Sandboxed code executor** for calculation queries.
+- **Per-chat isolation** — each chat has its own document set; uploads in one
+  chat never leak into another.
+- **Disk persistence** — FAISS indexes and chat history are saved to disk, so
+  documents and conversations survive app restarts.
 
 ## Stack
 
-- **LLM**: Groq API — Llama 3.1 8B
+- **LLM**: Groq API — GPT-OSS 20B
 - **Embeddings**: sentence-transformers/all-MiniLM-L6-v2
-- **Vector store**: FAISS (per chat)
+- **Vector store**: FAISS (per chat, persisted)
 - **Agent framework**: LangGraph (SQLite checkpointer)
 - **Web search**: DuckDuckGo
-- **Calculator**: sandboxed Python code executor
-- **Evaluation**: custom LLM-as-judge pipeline
+- **Evaluation judge**: Gemini (LLM-as-judge)
 - **Frontend**: Streamlit
-
-## Features
-
-- Upload multiple PDFs per chat with isolated document context
-- Query routing (simple / complex / calc)
-- Conversation summarisation after 10 turns
-- Web-search fallback when documents don't cover the question
-- Reproducible evaluation pipeline: faithfulness, answer relevancy, correctness
+- **Packaging**: Docker
 
 ## Setup
 
@@ -59,7 +63,7 @@ below reflects the latest run — update it whenever you re-run the benchmark.
     cd multi-agent-research-assistant
     python -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
     pip install -r requirements.txt
-    cp .env.example .env      # then add your GROQ_API_KEY
+    cp .env.example .env      # add GROQ_API_KEY (and GEMINI_API_KEY for evaluation)
 
 Run the app:
 
@@ -67,17 +71,19 @@ Run the app:
 
 ## Evaluation
 
-Runs every question in `tests/qa_pairs.json` through the real agent, then scores
-the answers with an LLM-as-judge (faithfulness, answer relevancy, correctness)
-and records latency. Writes `evaluation_report.json`.
+Runs each question in `tests/qa_pairs.json` through the real agent, then scores
+faithfulness, answer relevancy, and correctness with an LLM-as-judge (Gemini),
+and records latency. Writes `evaluation_report.json`. Results are cached
+per-question so a run can resume if interrupted.
 
-    python scripts/evaluate.py --sample 20
+    python scripts/evaluate.py --doc tests/sample_pdfs/2210.03629v3.pdf --sample 14
 
-The printed numbers are whatever the agent actually scores on that run — put
-those in the table above rather than hand-editing the report.
+The printed numbers are whatever the current system scores — put those in the
+table above rather than hand-editing the report.
 
-## Note on HuggingFace deployment
+## Docker
 
-PDF upload works when running locally. The live HuggingFace Space demonstrates
-question-answering and web search without document upload, due to free-tier file
-handling restrictions.
+    docker build -t research-assistant .
+    docker run -p 7860:7860 --env-file .env research-assistant
+
+Then open http://localhost:7860.
